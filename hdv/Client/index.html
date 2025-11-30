@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMax - Trang Web Bán Vé Xem Phim</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">Cine<span>Max</span></a>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html">Trang Chủ</a></li>
+                <li><a href="Phim.html">Phim</a></li>
+                <li><a href="RapChieu.html">Rạp Chiếu</a></li>
+                <li><a href="KhuyenMai.html">Khuyến Mãi</a></li>
+                <li><a href="LienHe.html">Liên Hệ</a></li>
+                <li><a href="DangKyThanhVien.html">Đăng ký hội viên</a></li>
+            </ul>
+            
+            <div class="user-actions">
+                <button class="btn btn-outline" id="loginBtn" onclick="redirectToTaiKhoan()">Đăng Nhập</button>
+                <button class="btn btn-primary" id="registerBtn" onclick="redirectToTaiKhoan()">Đăng Ký</button>
+            </div>
+        </div>
+    </header>
+
+   
+    <section class="hero-section">
+        <div class="hero-slider">
+            
+            <div class="hero-slide active" style="background-image: url('Anh.jpg');">
+                <div class="hero-content">
+                    <h1 class="hero-title">Trải Nghiệm Điện Ảnh Đỉnh Cao</h1>
+                    <p class="hero-subtitle"></p>
+                    <div class="hero-features">
+                        <div class="feature"><span class="feature-icon"></span><span>Phim mới cập nhật hàng tuần</span></div>
+                        <div class="feature"><span class="feature-icon"></span><span>Ghế ngồi êm ái, view đẹp</span></div>
+                        <div class="feature"><span class="feature-icon"></span><span>Đặt vé online dễ dàng</span></div>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="Phim.html" class="btn btn-primary btn-hero">Đặt Vé Ngay</a>
+                        <a href="XemLichChieu.html" class="btn btn-secondary btn-hero" target="_blank" rel="noopener noreferrer">Xem Lịch Chiếu</a>
+                    </div>
+                </div>
+            </div>
+
+         
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2050&q=80');">
+                <div class="hero-content">
+                    <h1 class="hero-title">Phim mới mỗi ngày</h1>
+                    <p class="hero-subtitle"></p>
+                    <div class="hero-features">
+                        <div class="feature"><span class="feature-icon"></span><span>Phim bom tấn thế giới</span></div>
+                        <div class="feature"><span class="feature-icon"></span><span>Phim Việt Nam</span></div>
+                        <div class="feature"><span class="feature-icon"></span><span>Giải thưởng quốc tế</span></div>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="Phim.html" class="btn btn-primary btn-hero">Xem Phim Đang Chiếu</a>
+                        <a href="XemLichChieu.html" class="btn btn-secondary btn-hero" target="_blank" rel="noopener noreferrer">Phim Sắp Chiếu</a>
+                    </div>
+                </div>
+            </div>
+
+           
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1595769816263-9b910be24d5f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2079&q=80');">
+                <div class="hero-content">
+                    <h1 class="hero-title">Ưu Đãi Đặc Biệt</h1>
+                    <p class="hero-subtitle"></p>
+                    <div class="hero-features">
+                        <div class="feature"><span class="feature-icon"></span><span>Giảm 50% vé các ngày thường</span></div>
+                        <div class="feature"><span class="feature-icon"></span><span>Combo bắp nước giá sốc</span></div>
+                        <div class="feature"><span class="feature-icon"></span><span>Ưu đãi thành viên VIP</span></div>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="DangKyThanhVien.html" class="btn btn-primary btn-hero">Xem Ưu Đãi</a>
+                        <a href="DangKyThanhVien.html" class="btn btn-secondary btn-hero">Đăng Ký Thành Viên</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-slide" style="background-image: url('https://images.unsplash.com/photo-1574267432553-4b4628081c31?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2031&q=80');">
+                <div class="hero-content">
+                    <h1 class="hero-title">Rạp Chiếu Hiện Đại</h1>
+                    <p class="hero-subtitle"></p>
+                    <div class="hero-features">
+                        <div class="feature"><span class="feature-icon"></span><span>IMAX & 4DX</span></div>
+                        <div class="feature"><span class="feature-icon"></span><span>Dolby Atmos</span></div>
+                        <div class="feature"><span class="feature-icon"></span><span>Nhiều chi nhánh</span></div>
+                    </div>
+                    <div class="hero-buttons">
+                        <a href="RapChieu.html" class="btn btn-primary btn-hero">Chọn Rạp</a>
+                        <a href="RapChieu.html" class="btn btn-secondary btn-hero">Xem Hệ Thống Rạp</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="slide-indicators">
+            <div class="indicator active" data-slide="0"></div>
+            <div class="indicator" data-slide="1"></div>
+            <div class="indicator" data-slide="2"></div>
+            <div class="indicator" data-slide="3"></div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="GioiThieu.html">Giới thiệu</a>
+                <a href="DieuKhoanSuDung.html">Điều khoản sử dụng</a>
+                <a href="ChinhSachBaoMat.html">Chính sách bảo mật</a>
+                <a href="CauHoiThuongGap.html">Câu hỏi thường gặp</a>
+                <a href="LienHe.html">Liên hệ</a>
+            </div>
+            <p class="copyright">© 2025 CineMax. Tất cả các quyền được bảo lưu.</p>
+        </div>
+    </footer>
+
+    <script>
+       
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.hero-slide');
+        const indicators = document.querySelectorAll('.indicator');
+        const slideInterval = 5000; 
+
+        function showSlide(index) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            indicators.forEach(indicator => indicator.classList.remove('active'));
+            slides[index].classList.add('active');
+            indicators[index].classList.add('active');
+            currentSlide = index;
+        }
+
+        function nextSlide() {
+            let next = currentSlide + 1;
+            if (next >= slides.length) { next = 0; }
+            showSlide(next);
+        }
+
+        let slideTimer = setInterval(nextSlide, slideInterval);
+
+        const heroSection = document.querySelector('.hero-section');
+        heroSection.addEventListener('mouseenter', () => { clearInterval(slideTimer); });
+        heroSection.addEventListener('mouseleave', () => { slideTimer = setInterval(nextSlide, slideInterval); });
+
+        indicators.forEach((indicator, index) => {
+            indicator.addEventListener('click', () => {
+                showSlide(index);
+                clearInterval(slideTimer);
+                slideTimer = setInterval(nextSlide, slideInterval);
+            });
+        });
+
+        function redirectToTaiKhoan() {
+            window.location.href = 'TaiKhoan.html';
+        }
+        function parseJwt(token) {
+          try {
+            const payload = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+            const json = decodeURIComponent(atob(payload).split('').map(c => '%' + ('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+            return JSON.parse(json);
+          } catch (e) { return null; }
+        }
+
+        function getStoredToken() {
+          return localStorage.getItem('adminToken') || localStorage.getItem('token') || null;
+        }
+
+        function logout() {
+          localStorage.removeItem('adminToken');
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          window.location.href = 'index.html';
+        }
+
+        function buildAuthUIFromToken(token) {
+          const payload = parseJwt(token) || {};
+          const name = payload.username || payload.name || payload.email || '';
+          const initials = (name || '').split(' ').filter(Boolean).map(s => s[0]).join('').slice(0,2).toUpperCase() ||
+                           (payload.email ? payload.email[0].toUpperCase() : 'U');
+
+          const wrap = document.createElement('div');
+          wrap.className = 'auth-wrap';
+
+          const avatarBtn = document.createElement('button');
+          avatarBtn.className = 'avatar-btn';
+          avatarBtn.title = name || 'Tài khoản';
+          avatarBtn.innerHTML = `<span class="avatar-initials">${initials}</span>`;
+          avatarBtn.addEventListener('click', () => { window.location.href = 'ThongTinCaNhan.html'; });
+
+          const profileLink = document.createElement('a');
+          profileLink.className = 'auth-action';
+          profileLink.href = 'ThongTinCaNhan.html';
+          profileLink.textContent = 'Hồ sơ';
+
+          const logoutBtn = document.createElement('button');
+          logoutBtn.className = 'auth-action';
+          logoutBtn.textContent = 'Đăng xuất';
+          logoutBtn.addEventListener('click', logout);
+
+          wrap.appendChild(avatarBtn);
+          wrap.appendChild(profileLink);
+          wrap.appendChild(logoutBtn);
+
+          return wrap;
+        }
+
+        function restoreDefaultAuthButtons(container) {
+          container.innerHTML = '';
+          const loginBtn = document.createElement('button');
+          loginBtn.className = 'btn btn-outline';
+          loginBtn.id = 'loginBtn';
+          loginBtn.textContent = 'Đăng Nhập';
+          loginBtn.onclick = redirectToTaiKhoan;
+
+          const registerBtn = document.createElement('button');
+          registerBtn.className = 'btn btn-primary';
+          registerBtn.id = 'registerBtn';
+          registerBtn.textContent = 'Đăng Ký';
+          registerBtn.onclick = redirectToTaiKhoan;
+
+          container.appendChild(loginBtn);
+          container.appendChild(registerBtn);
+        }
+
+        function updateAuthUI() {
+          const token = getStoredToken();
+          const userActions = document.querySelectorAll('.user-actions');
+          if (!userActions) return;
+          userActions.forEach(container => {
+            if (token) {
+              container.innerHTML = '';
+              const authUI = buildAuthUIFromToken(token);
+              container.appendChild(authUI);
+            } else {
+              restoreDefaultAuthButtons(container);
+            }
+          });
+        }
+
+        window.addEventListener('storage', (e) => {
+          if (e.key === 'adminToken' || e.key === 'token') updateAuthUI();
+        });
+
+        function loadDemoMovies() {
+            const container = document.getElementById('nowPlayingMovies');
+            const loading = document.getElementById('loadingMovies');
+            setTimeout(() => {
+                if (loading) loading.style.display = 'none';
+                if (typeof demoMovies === 'undefined' || !Array.isArray(demoMovies)) return;
+                demoMovies.forEach(movie => {
+                    const movieCard = document.createElement('div');
+                    movieCard.className = 'movie-card';
+                    movieCard.innerHTML = `
+                        <img src="${movie.image}" alt="${movie.title}" class="movie-poster">
+                        <div class="movie-info">
+                            <div class="movie-title">${movie.title}</div>
+                            <div class="movie-meta">
+                                <span>${movie.year}</span>
+                                <span class="rating">★ ${movie.rating}</span>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(movieCard);
+                });
+            }, 1500);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDemoMovies();
+            updateAuthUI(); 
+            document.querySelectorAll('.cinema-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const cinemaName = this.querySelector('h3') ? this.querySelector('h3').textContent : '';
+                    alert(`Đã chọn rạp: ${cinemaName}`);
+                });
+            });
+
+            document.querySelectorAll('.btn-hero').forEach(button => {
+                button.addEventListener('click', function() {
+                    const buttonText = this.textContent;
+                });
+            });
+        });
+    </script>
+    
+</body>
+</html>

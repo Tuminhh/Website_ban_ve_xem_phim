@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kết Quả Thanh Toán - CineMax</title>
+    <style>
+        :root {
+            --primary: #e50914; --secondary: #221f1f; --light: #f5f5f1;
+            --dark: #000000; --success: #46d369; --danger: #e50914;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--secondary);
+            color: var(--light); display: flex; align-items: center;
+            justify-content: center; min-height: 100vh; text-align: center; padding: 1rem;
+        }
+        .container {
+            background-color: var(--dark); padding: 3rem; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); max-width: 500px; width: 100%;
+        }
+        .icon { font-size: 5rem; line-height: 1; }
+        .icon.success { color: var(--success); }
+        .icon.failure { color: var(--danger); }
+        .icon.loading { color: var(--primary); animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        h1 { margin: 1.5rem 0 1rem; }
+        p { font-size: 1.1rem; margin-bottom: 2rem; color: #aaa; }
+        .btn {
+            display: inline-block; padding: 0.8rem 2rem; border: none; border-radius: 4px;
+            cursor: pointer; font-weight: 500; text-decoration: none;
+            font-size: 1rem; transition: all 0.3s;
+        }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: #b2070f; }
+    </style>
+</head>
+<body>
+    <div class="container" id="resultContainer">
+        <div id="loadingState">
+            <div class="icon loading">⏳</div>
+            <h1>Đang xác thực...</h1>
+            <p>Vui lòng chờ. Hệ thống đang kiểm tra lại giao dịch của bạn với server.</p>
+        </div>
+        <div id="successState" style="display: none;">
+            <div class="icon success">✅</div>
+            <h1>Thanh Toán Thành Công!</h1>
+            <p>Vé của bạn đã được xác nhận. Chúc bạn xem phim vui vẻ!</p>
+            <a href="index.html" class="btn btn-primary">Quay về Trang Chủ</a>
+        </div>
+        <div id="failureState" style="display: none;">
+            <div class="icon failure">❌</div>
+            <h1>Thanh Toán Thất Bại!</h1>
+            <p id="failureMessage">Giao dịch không thành công. Vui lòng thử lại.</p>
+            <a href="DatVe.html" class="btn btn-primary">Thử Lại</a>
+        </div>
+    </div>
+
+   <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            verifyPayment();
+        });
+
+        async function verifyPayment() {
+            const loadingEl = document.getElementById('loadingState');
+            const successEl = document.getElementById('successState');
+            const failureEl = document.getElementById('failureState');
+            const failureMsgEl = document.getElementById('failureMessage');
+
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const momoResultCode = urlParams.get('resultCode');
+                const orderId = urlParams.get('orderId'); 
+                const message = urlParams.get('message');
+                const method = urlParams.get('method');
+
+                
+                if (method === 'cash') {
+                    
+                    const successH1 = document.querySelector('#successState h1');
+                    const successP = document.querySelector('#successState p');
+                    
+                    
+                    successH1.textContent = 'Giữ Chỗ Thành Công!';
+                    successP.textContent = `Bạn đã giữ chỗ thành công với mã vé #${orderId}. Vui lòng thanh toán tại quầy trước giờ chiếu.`;
+                    
+                    showState('success'); 
+                    return; 
+                }
+                
+                
+                if (momoResultCode !== '0') {
+                    failureMsgEl.textContent = `Giao dịch thất bại: ${message}`;
+                    showState('failure');
+                    return;
+                }
+
+                const response = await fetch(`http://localhost:4000/api/payments/status/${orderId}`);
+                if (!response.ok) {
+                    throw new Error('Không thể kết nối với server để xác thực.');
+                }
+                const data = await response.json();
+
+                if (data.status === 'CONFIRMED') {
+
+                    showState('success');
+                } else if (data.status === 'PENDING') {
+
+                    const pendingEl = document.getElementById('loadingState');
+                    pendingEl.innerHTML = `
+                        <div class="icon loading" style="color: var(--warning);">⌛</div>
+                        <h1>Đang chờ xác nhận</h1>
+                        <p>Đơn hàng của bạn đã được ghi nhận. Hệ thống đang chờ nhận được thanh toán. 
+                        Trạng thái sẽ tự động cập nhật sau 5-10 phút.</p>
+                        <a href="/TrangChu/TrangChu.html" class="btn btn-primary" style="background:var(--primary); color:white; padding: 0.8rem 2rem; border-radius:4px; text-decoration:none;">Về Trang Chủ</a>
+                    `;
+                    showState('loading');
+                } else {
+                    
+                    failureMsgEl.textContent = 'Giao dịch thất bại hoặc không tìm thấy.';
+                    showState('failure');
+                }
+
+            } catch (error) {
+                console.error('Lỗi xác thực:', error);
+                failureMsgEl.textContent = error.message;
+                showState('failure');
+            }
+        }
+
+        function showState(state) {
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('successState').style.display = 'none';
+            document.getElementById('failureState').style.display = 'none';
+            document.getElementById(state + 'State').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

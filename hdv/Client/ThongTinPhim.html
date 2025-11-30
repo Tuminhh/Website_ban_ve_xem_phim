@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Chi tiết phim - CINEMAX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif}
+        :root{--primary:#e50914;--dark:#0f1419;--secondary:#1a2a3a;--light:#fff;--gray:#9aa3ad}
+        body{background:var(--dark);color:var(--light);line-height:1.5}
+        .container{max-width:1100px;margin:30px auto;padding:0 20px}
+        header{padding:16px 0}
+        .logo{font-size:26px;color:var(--primary);text-decoration:none;display:inline-flex;align-items:center}
+        .logo span{color:var(--light);margin-left:6px}
+        .back-link{color:var(--light);text-decoration:none;margin-left:20px;font-size:14px}
+        .back-link:hover{color:var(--primary)}
+        .detail-card{display:flex;gap:28px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);padding:24px;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,0.6)}
+        .poster{width:320px;flex:0 0 320px;border-radius:8px;object-fit:cover}
+        .info{flex:1;display:flex;flex-direction:column;gap:12px}
+        .title{font-size:28px;font-weight:700}
+        .meta{color:var(--gray);font-size:14px;display:flex;gap:12px;flex-wrap:wrap}
+        .overview{color:#d1d7db;margin-top:8px}
+        .info-row{display:flex;gap:16px;flex-wrap:wrap}
+        .tag{background:rgba(255,255,255,0.03);padding:6px 10px;border-radius:6px;font-size:13px;color:var(--gray)}
+        .actions{margin-top:auto;display:flex;gap:12px}
+        .btn{background:var(--primary);color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;font-weight:600;border:none;cursor:pointer}
+        .btn.secondary{background:transparent;border:2px solid var(--primary);color:var(--light)}
+        .loading{text-align:center;padding:40px}
+        .spinner{border:4px solid rgba(255,255,255,0.08);border-top:4px solid var(--primary);width:40px;height:40px;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto}
+        @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+        .error{background:rgba(229,9,20,0.05);padding:16px;border-radius:8px;color:var(--primary);text-align:center}
+        .trailer-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:1200;align-items:center;justify-content:center}
+        .trailer-wrapper{width:90%;max-width:900px;background:transparent;border-radius:8px;position:relative}
+        .trailer-close{
+            position:absolute;
+            right:8px;
+            top:-18px;
+            background: rgba(255,255,255,0.95);
+            color:#111;
+            border-radius:50%;
+            width:36px;
+            height:36px;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            border:none;
+            cursor:pointer;
+            font-size:18px;
+            font-weight:700;
+            box-shadow:0 4px 12px rgba(0,0,0,0.4);
+            z-index:9999;
+        }
+        @media(max-width:900px){.detail-card{flex-direction:column}.poster{width:100%;height:auto;flex:none}}
+    </style>
+</head>
+<body>
+    <header class="container">
+        <a href="index.html" class="logo"><i class="fas fa-film"></i><span>CINEMAX</span></a>
+        <a href="Phim.html" class="back-link"><i class="fas fa-arrow-left"></i> Quay lại danh sách phim</a>
+    </header>
+
+    <main class="container">
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p>Đang tải thông tin phim...</p>
+        </div>
+
+        <div id="content" style="display:none">
+            <div class="detail-card" id="detailCard">
+                <img id="poster" class="poster" src="" alt="Poster phim">
+                <div class="info">
+                    <div>
+                        <div class="title" id="title"></div>
+                        <div class="meta" id="meta"></div>
+                    </div>
+
+                    <div class="info-row" id="tags"></div>
+
+                    <div class="overview" id="plot"></div>
+
+                    <div class="info-row">
+                        <div class="tag" id="director"></div>
+                        <div class="tag" id="actors"></div>
+                        <div class="tag" id="genre"></div>
+                    </div>
+
+                    <div class="actions">
+                        <a id="buyBtn" class="btn" href="#">Đặt vé</a>
+                        <button id="openTrailer" class="btn secondary">Xem trailer</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="trailerModal" class="trailer-modal" role="dialog" aria-hidden="true">
+            <div class="trailer-wrapper">
+                <button class="trailer-close" aria-label="Đóng trailer" onclick="closeTrailer()">✕</button>
+                 <div id="trailerContainer" style="position:relative;padding-top:56.25%;background:#000;border-radius:8px;overflow:hidden"></div>
+             </div>
+         </div>
+
+        <div id="error" style="display:none" class="error"></div>
+    </main>
+
+    <script>
+        const YT_API_KEY = 'AIzaSyClS7QXw9qktL4tEQC2qXCBdncSBvzwCP8';
+         const API_KEY = 'fa85c569'; 
+         const BASE_URL = 'https://www.omdbapi.com/';
+
+        function getQueryParam(name) {
+            const params = new URLSearchParams(window.location.search);
+            return params.get(name);
+        }
+
+        async function fetchMovie(imdbID) {
+            try {
+                const res = await fetch(`${BASE_URL}?i=${encodeURIComponent(imdbID)}&plot=full&apikey=${API_KEY}`);
+                if (!res.ok) throw new Error('Network response not ok');
+                const data = await res.json();
+                if (data.Response === 'False') throw new Error(data.Error || 'Không có dữ liệu');
+                return data;
+            } catch (err) {
+                throw err;
+            }
+        }
+
+        function showError(msg) {
+            document.getElementById('loading').style.display = 'none';
+            const err = document.getElementById('error');
+            err.textContent = msg;
+            err.style.display = 'block';
+            document.getElementById('content').style.display = 'none';
+        }
+
+        function renderMovie(data) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('content').style.display = 'block';
+
+            const poster = (data.Poster && data.Poster !== 'N/A') ? data.Poster : 'https://via.placeholder.com/500x750/1a2a3a/ffffff?text=No+Image';
+            document.getElementById('poster').src = poster;
+            document.getElementById('poster').alt = data.Title || 'Poster';
+
+            document.getElementById('title').textContent = `${data.Title || 'N/A'} (${data.Year || 'N/A'})`;
+            document.getElementById('meta').innerHTML = `<span class="tag">IMDb: ${data.imdbRating || 'N/A'}</span><span class="tag">${data.Runtime || 'N/A'}</span><span class="tag">${data.Rated || ''}</span>`;
+
+            document.getElementById('plot').textContent = data.Plot && data.Plot !== 'N/A' ? data.Plot : 'Chưa có mô tả.';
+            document.getElementById('director').textContent = `Đạo diễn: ${data.Director || 'N/A'}`;
+            document.getElementById('actors').textContent = `Diễn viên: ${data.Actors || 'N/A'}`;
+            document.getElementById('genre').textContent = `Thể loại: ${data.Genre || 'N/A'}`;
+
+            const tagsContainer = document.getElementById('tags');
+            tagsContainer.innerHTML = '';
+            if (data.Language && data.Language !== 'N/A') tagsContainer.insertAdjacentHTML('beforeend', `<div class="tag">${data.Language}</div>`);
+            if (data.Country && data.Country !== 'N/A') tagsContainer.insertAdjacentHTML('beforeend', `<div class="tag">${data.Country}</div>`);
+            if (data.Awards && data.Awards !== 'N/A') tagsContainer.insertAdjacentHTML('beforeend', `<div class="tag">${data.Awards}</div>`);
+
+            const buyBtn = document.getElementById('buyBtn');
+            buyBtn.href = `DatVe.html?movieId=${encodeURIComponent(data.imdbID)}&title=${encodeURIComponent(data.Title)}`;
+
+            document.getElementById('openTrailer').onclick = () => playTrailer(data.Title);
+         }
+
+         (async function init() {
+             const imdbID = getQueryParam('movie');
+             if (!imdbID) {
+                 showError('Không tìm thấy mã phim. Vui lòng chọn phim từ trang danh sách.');
+                 return;
+             }
+             try {
+                 const movie = await fetchMovie(imdbID);
+                 renderMovie(movie);
+             } catch (err) {
+                 console.error(err);
+                 showError('Lỗi khi tải thông tin phim: ' + (err.message || 'Không xác định'));
+             }
+         })();
+
+        async function playTrailer(title) {
+            const q = encodeURIComponent(`${title} trailer official`);
+            const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=1&q=${q}&key=${YT_API_KEY}`;
+            try {
+                const res = await fetch(url);
+                if (!res.ok) throw new Error('YouTube API lỗi');
+                const json = await res.json();
+                const item = json.items && json.items[0];
+                if (!item || !item.id || !item.id.videoId) {
+                    alert('Không tìm thấy trailer trên YouTube.');
+                    return;
+                }
+                const vid = item.id.videoId;
+                const iframe = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="position:absolute;left:0;top:0;width:100%;height:100%;"></iframe>`;
+                document.getElementById('trailerContainer').innerHTML = iframe;
+                const modal = document.getElementById('trailerModal');
+                modal.style.display = 'flex';
+                modal.setAttribute('aria-hidden','false');
+            } catch (e) {
+                console.error(e);
+                alert('Lỗi khi tải trailer.');
+            }
+        }
+
+        function closeTrailer() {
+            const modal = document.getElementById('trailerModal');
+            document.getElementById('trailerContainer').innerHTML = '';
+            modal.style.display = 'none';
+            modal.setAttribute('aria-hidden','true');
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeTrailer();
+        });
+
+        document.getElementById('trailerModal').addEventListener('click', function(e) {
+
+            if (e.target && e.target.id === 'trailerModal') closeTrailer();
+        });
+    </script>
+</body>
+</html>

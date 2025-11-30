@@ -1,0 +1,127 @@
+
+services:
+  mysql_db:
+    image: mysql:8.0
+    container_name: cinemax_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  auth-service:
+    build: ./auth-service
+    container_name: cinemax_auth
+    restart: on-failure
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+      - DB_HOST=mysql_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=auth_db  
+      - DB_DIALECT=mysql
+      - JWT_SECRET=supersecretkey
+      - CLIENT_URL=http://localhost:8080
+      - CALLBACK_BASE_URL=http://localhost:3000
+      - GOOGLE_CLIENT_ID=65661515265-8s4s8c7ii3c6fsnat78e77hbu0gbc6ur.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
+      - FACEBOOK_APP_ID=1995371904553935
+      - FACEBOOK_APP_SECRET=eac15dd76d818fc13c9103625ad75d46
+    depends_on:
+      - mysql_db
+
+  movie-service:
+    build: ./movie-service
+    container_name: cinemax_movie
+    restart: on-failure
+    ports:
+      - "3002:3002"
+    environment:
+      - PORT=3002
+      - DB_HOST=mysql_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=movie_db 
+      - DB_DIALECT=mysql
+      - OMDB_API_KEY=fa85c569
+    depends_on:
+      - mysql_db
+
+  booking-service:
+    build: ./booking-service
+    container_name: cinemax_booking
+    restart: on-failure
+    ports:
+      - "3003:3003"
+    environment:
+      - PORT=3003
+      - DB_HOST=mysql_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=booking_db 
+      - DB_DIALECT=mysql
+      - JWT_SECRET=supersecretkey
+    depends_on:
+      - mysql_db
+
+  payment-service:
+    build: ./payment-service
+    container_name: cinemax_payment
+    restart: on-failure
+    ports:
+      - "3004:3004"
+    environment:
+      - PORT=3004
+      - DB_HOST=mysql_db
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=payment_db 
+      - DB_DIALECT=mysql
+      - BOOKING_SERVICE_URL=http://booking-service:3003
+      - MOMO_PARTNER_CODE=MOMO
+      - MOMO_ACCESS_KEY=F8BBA842ECF85
+      - MOMO_SECRET_KEY=K951B6PE1waDMi640xX08PD3vg6EkVlz
+      - MOMO_ENDPOINT=https://test-payment.momo.vn/v2/gateway/api/create
+      - MOMO_IPN_URL=https://precursory-concurringly-cecil.ngrok-free.dev/api/payments/momo-callback
+      - MOMO_REDIRECT_URL=http://localhost:5173/TrangChu/payment-result.html
+      - VNPAY_TMN_CODE=F5DZKW5R
+      - VNPAY_HASH_SECRET=FNIKCLMXJHBOBDODGDNMRISRHXSFRHDQ
+      - VNPAY_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+      - VNPAY_RETURN_URL=https://google.com
+      - VNPAY_IPN_URL=https://precursory-concurringly-cecil.ngrok-free.dev/api/payments/vnpay-callback
+      - VIETQR_BANK_ID=970422
+      - VIETQR_ACCOUNT_NO=0339851913
+      - VIETQR_ACCOUNT_NAME=DUONG ANH TUAN
+    depends_on:
+      - mysql_db
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: cinemax_gateway
+    restart: on-failure
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+    depends_on:
+      - auth-service
+      - movie-service
+      - booking-service
+      - payment-service
+
+  frontend:
+    build: ./Client
+    container_name: cinemax_frontend
+    restart: on-failure
+    ports:
+      - "8080:80"
+    depends_on:
+      - api-gateway
+
+volumes:
+  mysql_data:

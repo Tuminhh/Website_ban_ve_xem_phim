@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phim Chiếu Rạp - CINEMAX</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://static.vecteezy.com/system/resources/thumbnails/006/240/302/small/abstract-soft-focus-sunset-field-landscape-of-yellow-flowers-and-grass-meadow-warm-golden-hour-sunset-sunrise-time-tranquil-spring-summer-nature-closeup-and-blurred-forest-background-idyllic-nature-photo.jpg') center/cover fixed;
+            background-attachment: fixed;
+        }
+        main.container {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+        .movie-card { cursor: pointer; transition: transform 0.3s; }
+        .movie-card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(229, 9, 20, 0.4); }
+        .movie-poster { width: 100%; height: 400px; object-fit: cover; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">Cine<span>Max</span></a>
+            <ul class="nav-menu">
+                <li><a href="index.html">Trang Chủ</a></li>
+                <li><a href="Phim.html">Phim</a></li>
+                <li><a href="RapChieu.html">Rạp Chiếu</a></li>
+                <li><a href="KhuyenMai.html">Khuyến Mãi</a></li>
+            </ul>
+            <div class="user-actions">
+                <button class="btn btn-outline" id="loginBtn" onclick="location.href='TaiKhoan.html'">Đăng Nhập</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <h2 class="section-title" id="movies">Phim Đang Chiếu</h2>
+        
+        <div class="search-container">
+            <div class="search-box">
+                <input type="text" id="search-input" class="search-input" placeholder="Tìm phim trong rạp..." style="border: 2px solid var(--light); border-radius: 6px 0 0 6px;">
+                <button id="search-btn" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading" style="display: none;">
+            <div class="spinner"></div>
+            <p>Đang tải danh sách phim...</p>
+        </div>
+        
+        <div id="movies-container" class="movies-grid">
+            </div>
+    </main>
+
+    <script>
+        
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        
+        const OMDB_API_KEY = 'fa85c569'; 
+        const OMDB_URL = `https://www.omdbapi.com/?apikey=${OMDB_API_KEY}`;
+
+        let allMoviesCombined = []; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initPage();
+            
+            document.getElementById('search-input').addEventListener('keyup', (e) => {
+                handleLocalFilter(e.target.value);
+            });
+        });
+
+        async function initPage() {
+            const loadingEl = document.getElementById('loading');
+            const moviesContainer = document.getElementById('movies-container');
+            
+            if (loadingEl) loadingEl.style.display = 'block';
+            if (moviesContainer) moviesContainer.innerHTML = '';
+
+            try {
+
+                const response = await fetch(`${API_BASE_URL}/movies`);
+                if (!response.ok) throw new Error('Lỗi kết nối Server.');
+                
+                const localMovies = await response.json();
+                
+                if (localMovies.length === 0) {
+                    moviesContainer.innerHTML = '<div class="error-message" style="grid-column: 1/-1;"><p>Hiện chưa có phim nào đang chiếu.</p></div>';
+                    loadingEl.style.display = 'none';
+                    return;
+                }
+
+
+                const enrichedMovies = await Promise.all(localMovies.map(async (localMovie) => {
+                    const omdbData = await fetchOMDbData(localMovie.title);
+                    
+
+                    return {
+                        id: localMovie.id, 
+                        title: localMovie.title,
+                        poster: (omdbData && omdbData.Poster !== 'N/A') ? omdbData.Poster : (localMovie.posterUrl || 'https://via.placeholder.com/300x450?text=No+Poster'),
+                        rating: omdbData ? omdbData.imdbRating : 'N/A',
+                        year: omdbData ? omdbData.Year : (localMovie.releaseDate ? new Date(localMovie.releaseDate).getFullYear() : 'N/A'),
+                        duration: omdbData ? omdbData.Runtime : (localMovie.duration + ' min'),
+                        plot: omdbData ? omdbData.Plot : (localMovie.description || 'Chưa có mô tả')
+                    };
+                }));
+
+                allMoviesCombined = enrichedMovies; 
+                displayMovies(allMoviesCombined);
+
+            } catch (err) {
+                console.error('Lỗi:', err);
+                moviesContainer.innerHTML = `<div class="error-message" style="grid-column: 1/-1;"><p>Lỗi tải dữ liệu: ${err.message}</p></div>`;
+            } finally {
+                if (loadingEl) loadingEl.style.display = 'none';
+            }
+        }
+
+        async function fetchOMDbData(title) {
+            try {
+                const res = await fetch(`${OMDB_URL}&t=${encodeURIComponent(title)}`);
+                const data = await res.json();
+                
+                if (data.Response === 'True') {
+                    return data;
+                }
+                return null; 
+            } catch (err) {
+                console.warn(`Lỗi lấy OMDb cho phim ${title}:`, err);
+                return null;
+            }
+        }
+
+        function displayMovies(movies) {
+            const moviesContainer = document.getElementById('movies-container');
+            moviesContainer.innerHTML = '';
+            
+            if (movies.length === 0) {
+                moviesContainer.innerHTML = '<p style="text-align:center; grid-column:1/-1">Không tìm thấy phim phù hợp.</p>';
+                return;
+            }
+
+            movies.forEach(movie => {
+                const movieCard = document.createElement('div');
+                movieCard.className = 'movie-card';
+                
+                const bookingLink = `DatVe.html?movieId=${movie.id}&title=${encodeURIComponent(movie.title)}`;
+
+                movieCard.innerHTML = `
+                    <a href="${bookingLink}">
+                        <img src="${movie.poster}" alt="${movie.title}" class="movie-poster">
+                    </a>
+                    <div class="movie-info">
+                        <h3 class="movie-title">${movie.title}</h3>
+                        <div class="movie-meta">
+                            <span class="movie-rating"><i class="fas fa-star" style="color:gold"></i> ${movie.rating}</span>
+                            <span>${movie.year}</span>
+                        </div>
+                        <p class="movie-overview" style="font-size: 0.9em; color: #ccc; margin: 10px 0; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;">
+                            ${movie.plot}
+                        </p>
+                        <a class="btn btn-outline" href="${bookingLink}" style="margin-top: auto; width: 100%; text-align: center;">Đặt Vé Ngay</a>
+                    </div>`;
+                moviesContainer.appendChild(movieCard);
+            });
+        }
+
+        function handleLocalFilter(keyword) {
+            const term = keyword.toLowerCase().trim();
+            const filtered = allMoviesCombined.filter(m => m.title.toLowerCase().includes(term));
+            displayMovies(filtered);
+        }
+    </script>
+</body>
+</html>

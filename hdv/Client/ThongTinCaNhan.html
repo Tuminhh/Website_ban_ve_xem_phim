@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMax - Tài khoản của tôi</title>
+
+    <style>
+        :root {
+            --primary: #e50914;
+            --primary-dark: #b2070f;
+            --secondary: #221f1f;
+            --light: #f5f5f1;
+            --dark: #0b0d0f;
+            --gray: #9a9a9a;
+            --card-bg: rgba(255,255,255,0.04);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--secondary);
+            color: var(--light);
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.5;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+        }
+
+        /* Header */
+        .header-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 18px 20px;
+        }
+        header { background: var(--dark); border-bottom: 1px solid rgba(255,255,255,0.04); position: sticky; top: 0; z-index: 50; }
+        .logo { color: var(--primary); font-weight: 700; font-size: 1.4rem; text-decoration: none; }
+        .logo span { color: var(--light); }
+
+        nav { display: flex; gap: 18px; align-items: center; }
+        nav a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 6px 8px;
+            border-radius: 6px;
+            transition: background .15s, color .15s;
+            font-size: 0.95rem;
+        }
+        nav a:hover { background: rgba(255,255,255,0.03); color: var(--primary); }
+
+        /* Auth / user menu */
+        #auth-links { display: inline-flex; align-items: center; gap: 8px; }
+        .auth-button {
+            color: var(--light);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: transparent;
+            font-weight: 600;
+        }
+
+        #user-menu { display: flex; align-items: center; gap: 10px; position: relative; }
+        #user-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid rgba(255,255,255,0.06);
+            cursor: pointer;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+        }
+        #user-name-display {
+            color: var(--light);
+            font-weight: 600;
+            max-width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        /* dropdown */
+        .dropdown-content {
+            position: absolute;
+            right: 0;
+            top: calc(100% + 8px);
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 8px;
+            border-radius: 8px;
+            display: none;
+            min-width: 180px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.6);
+            z-index: 60;
+        }
+        .dropdown-content a {
+            display: block;
+            padding: 8px;
+            color: var(--light);
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        .dropdown-content a:hover { background: rgba(255,255,255,0.03); color: var(--primary); }
+
+        /* Container / layout */
+        .container {
+            max-width: 1000px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 10px;
+        }
+        .profile-layout { display: grid; grid-template-columns: 280px 1fr; gap: 24px; align-items: start; }
+        .profile-sidebar {
+            padding: 18px;
+            background: rgba(0,0,0,0.12);
+            border-radius: 8px;
+        }
+
+        .profile-sidebar .avatar-large {
+            width: 100%;
+            height: 220px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: block;
+            margin-bottom: 12px;
+        }
+        .profile-sidebar h3 { margin-bottom: 6px; color: var(--light); }
+        .profile-sidebar p { color: var(--gray); font-size: 0.95rem; }
+
+        .profile-content { padding: 12px; }
+        h2 { color: var(--primary); margin-bottom: 1rem; border-bottom: 2px solid rgba(255,255,255,0.03); padding-bottom: 8px; }
+
+        /* form */
+        #profile-form { display: grid; gap: 12px; }
+        .form-group label { display:block; margin-bottom:6px; color: var(--gray); font-weight:600; }
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(255,255,255,0.06);
+            background: rgba(0,0,0,0.18);
+            color: var(--light);
+            font-size: 1rem;
+        }
+        .form-control[readonly] { opacity: 0.9; }
+
+        /* bookings */
+        #booking-list { display:flex; flex-direction:column; gap:12px; margin-top: 8px; }
+        .booking-item {
+            background: rgba(0,0,0,0.18);
+            padding: 14px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+        }
+        .booking-item h4 { margin-bottom:6px; color: var(--light); }
+        .booking-item p { color: var(--gray); font-size:0.95rem; margin-bottom:4px; }
+
+        /* responsive */
+        @media (max-width: 860px) {
+            .profile-layout { grid-template-columns: 1fr; }
+            nav { display: none; }
+            .header-container { padding: 12px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">Cine<span>Max</span></a>
+            <nav>
+                <a href="index.html">Trang Chủ</a>
+                <a href="XemLichChieu.html">Lịch Chiếu</a>
+                <a href="Phim.html">Phim</a>
+            </nav>
+
+            <div id="auth-links">
+                 <a href="TaiKhoan.html" class="auth-button">Tài khoản</a>
+            </div>
+
+            <div id="user-menu" style="display: none;">
+                <img id="user-avatar" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><rect fill='%23f0f2f5' width='400' height='400'/><g fill='%239aa7b4'><circle cx='200' cy='140' r='70'/><path d='M100 320c0-60 50-110 100-110s100 50 100 110z'/></g></svg>" alt="Avatar">
+                 <span id="user-name-display"></span>
+                 <div class="dropdown-content" id="user-dropdown">
+                     <a href="ThongTinCaNhan.html">Tài khoản của tôi</a>
+                     <a href="#" id="logout-button">Đăng xuất</a>
+                 </div>
+             </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="profile-layout">
+
+            <aside class="profile-sidebar">
+                <img id="profile-avatar-large" class="avatar-large" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><rect fill='%23f0f2f5' width='400' height='400'/><g fill='%239aa7b4'><circle cx='200' cy='140' r='70'/><path d='M100 320c0-60 50-110 100-110s100 50 100 110z'/></g></svg>" alt="Avatar">
+                 <h3 id="sidebar-name">Tên người dùng</h3>
+                 <p id="sidebar-email">email@example.com</p>
+             </aside>
+
+            <section class="profile-content">
+                <h2>Thông tin tài khoản</h2>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label>Họ và tên</label>
+                        <input type="text" id="profile-username" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" id="profile-email" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="tel" id="profile-phone" class="form-control" readonly>
+                    </div>
+                </form>
+
+                <hr style="margin: 1.5rem 0; border-color: rgba(255,255,255,0.06);">
+
+                <h2>Vé đã đặt</h2>
+                <div id="booking-list">
+                    <p>Đang tải danh sách vé...</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script>
+        
+        (function(){
+            const userMenu = document.getElementById('user-menu');
+            const authLinks = document.getElementById('auth-links');
+            const avatar = document.getElementById('user-avatar');
+            const userNameDisplay = document.getElementById('user-name-display');
+            const dropdown = document.getElementById('user-dropdown');
+            const logoutBtn = document.getElementById('logout-button');
+
+            function showAuthUI(user) {
+                authLinks.style.display = 'none';
+                userMenu.style.display = 'flex';
+                userNameDisplay.textContent = user.username || user.email || '';
+                document.getElementById('profile-avatar-large').src = user.avatar || "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 400'><rect fill='%23f0f2f5' width='400' height='400'/><g fill='%239aa7b4'><circle cx='200' cy='140' r='70'/><path d='M100 320c0-60 50-110 100-110s100 50 100 110z'/></g></svg>";
+                document.getElementById('sidebar-name').textContent = user.username || user.email || 'Người dùng';
+                document.getElementById('sidebar-email').textContent = user.email || '';
+            }
+
+            function showGuest() {
+                authLinks.style.display = 'inline-flex';
+                userMenu.style.display = 'none';
+            }
+
+            avatar && avatar.addEventListener('click', () => {
+                if (!dropdown) return;
+                dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+            });
+
+            logoutBtn && logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                localStorage.removeItem('adminToken');
+                localStorage.removeItem('user');
+                showGuest();
+                window.location.href = 'TaiKhoan.html';
+            });
+
+            
+            window.__showAuthUI = showAuthUI;
+            window.__showGuest = showGuest;
+        })();
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
+            const bookingListDiv = document.getElementById('booking-list');
+
+            if (!token) {
+                alert('Vui lòng đăng nhập để xem thông tin.');
+                window.location.href = 'TaiKhoan.html';
+                return;
+            }
+
+            try {
+                const res = await fetch('http://localhost:3000/api/users/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (res.status === 401) {
+                    localStorage.clear();
+                    alert('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+                    window.location.href = 'TaiKhoan.html';
+                    return;
+                }
+
+                if (!res.ok) throw new Error('Không thể tải thông tin. Lỗi server.');
+
+                const data = await res.json();
+
+                if (data.user) {
+                    document.getElementById('profile-username').value = data.user.username || '';
+                    document.getElementById('profile-email').value = data.user.email || '';
+                    document.getElementById('profile-phone').value = data.user.phone || 'Chưa cập nhật';
+
+                    
+                    if (window.__showAuthUI) window.__showAuthUI(data.user);
+                }
+
+                if (data.bookings && data.bookings.length > 0) {
+                    bookingListDiv.innerHTML = '';
+                    data.bookings.forEach(booking => {
+                        const bookingEl = document.createElement('div');
+                        bookingEl.className = 'booking-item';
+                        bookingEl.innerHTML = `
+                            <h4>Mã đặt vé: #${booking.id}</h4>
+                            <p><strong>Ngày đặt:</strong> ${new Date(booking.createdAt).toLocaleString('vi-VN')}</p>
+                            <p><strong>Trạng thái:</strong> ${booking.status || 'Đã xác nhận'}</p>
+                        `;
+                        bookingListDiv.appendChild(bookingEl);
+                    });
+                } else {
+                    bookingListDiv.innerHTML = '<p>Bạn chưa đặt vé nào.</p>';
+                }
+
+            } catch (error) {
+                console.error('Lỗi khi tải profile:', error);
+                bookingListDiv.innerHTML = `<p style="color: red;">${error.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

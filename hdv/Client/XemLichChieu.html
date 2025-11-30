@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CineMax - Lịch Chiếu</title>
+  <style>
+    body { background-color: #221f1f; color: #fff; font-family: 'Segoe UI'; margin: 0; }
+    header, footer { background-color: #000; padding: 1rem 2rem; }
+    .container { max-width: 1200px; margin: auto; padding: 2rem; }
+    .section-title { font-size: 2rem; border-bottom: 2px solid #e50914; margin-bottom: 1.5rem; }
+    .schedule-table { width: 100%; border-collapse: collapse; background-color: rgba(255,255,255,0.05); margin-top: 1rem; }
+    .schedule-table th, .schedule-table td { padding: 0.75rem; border-bottom: 1px solid rgba(255,255,255,0.12); vertical-align: middle; }
+    .schedule-table th { background-color: rgba(255,255,255,0.06); color: #e50914; text-align:left; }
+    .movie-poster { width:56px; height:80px; object-fit:cover; border-radius:4px; margin-right:0.75rem; vertical-align:middle; }
+    .movie-cell { display:flex; align-items:center; gap:0.5rem; }
+    .time-button { background:transparent; color:#fff; border:1px solid rgba(255,255,255,0.12); padding:6px 10px; margin:3px; border-radius:6px; cursor:pointer; text-decoration:none; display:inline-block; }
+    .time-button:hover { background:#e50914; border-color:#e50914; }
+    .controls { display:flex; gap:12px; align-items:center; margin-bottom:0.75rem; flex-wrap:wrap; }
+    .date-input { padding:8px 10px; border-radius:6px; border:1px solid rgba(255,255,255,0.08); background:transparent; color:#fff; }
+    .btn-primary { background-color: #e50914; color: white; padding: 0.5rem 1rem; border: none; border-radius: 5px; cursor: pointer; }
+    .btn-primary:hover { background-color: #b2070f; }
+    .empty { padding:2rem; text-align:center; color:#aaa; }
+    @media (max-width:720px) { .movie-poster{width:44px;height:64px} .section-title{font-size:1.4rem} }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html" style="color:#e50914;font-size:1.8rem;text-decoration:none;font-weight:bold;">Cine<span style="color:#fff;">Max</span></a>
+  </header>
+
+  <main class="container">
+    <h2 class="section-title">🎟️ Lịch Chiếu</h2>
+
+    <div class="controls">
+      <label>
+        Chọn ngày:
+        <input id="datePicker" class="date-input" type="date">
+      </label>
+      <button id="refreshBtn" class="btn-primary">Tải lại</button>
+      <div id="status" style="color:#aaa;font-size:0.95rem;margin-left:8px;"></div>
+    </div>
+
+    <div id="scheduleArea">
+      <table id="scheduleTable" class="schedule-table" aria-live="polite">
+        <thead>
+          <tr>
+            <th>Phim</th>
+            <th>Rạp</th>
+            <th>Suất</th>
+          </tr>
+        </thead>
+        <tbody id="scheduleBody">
+          <tr><td colspan="3" class="empty">Đang tải lịch chiếu...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <footer style="text-align:center;color:#757575;">
+    © 2025 CineMax. Tất cả các quyền được bảo lưu.
+  </footer>
+
+  <script>
+    const API_KEY = 'fa85c569';
+    const BASE_URL = 'https://www.omdbapi.com/';
+    const API_URL = ''; 
+
+    const posterCache = {};
+    const sampleMovies = [
+      { movieId: 'tt0133093', title: 'The Matrix', poster: 'https://m.media-amazon.com/images/M/MV5BNzQzOTk3NjAt...jpg', genre: 'Hành động' },
+      { movieId: 'tt1375666', title: 'Inception', poster: 'https://m.media-amazon.com/images/M/MV5BMjAxMzY3NjY4...jpg', genre: 'Phiêu lưu' },
+      { movieId: 'tt0111161', title: 'The Shawshank Redemption', poster: '', genre: 'Drama' },
+      { movieId: 'tt0137523', title: 'Fight Club', poster: '', genre: 'Tâm lý' },
+      { movieId: 'tt0120737', title: 'The Lord of the Rings', poster: '', genre: 'Phiêu lưu' },
+      { movieId: 'tt0468569', title: 'The Dark Knight', poster: '', genre: 'Hành động' },
+      { movieId: 'tt4154796', title: 'Avengers: Endgame', poster: '', genre: 'Hành động' },
+      { movieId: 'tt4154756', title: 'Avengers: Infinity War', poster: '', genre: 'Hành động' }
+    ];
+
+    const demoCinemas = [
+      { name: 'CGV Diamond', location: 'Quận 1, TP.HCM' },
+      { name: 'Galaxy Nguyễn Du', location: 'Quận 1, TP.HCM' },
+      { name: 'BHD Star', location: 'Quận 7, TP.HCM' },
+      { name: 'Lotte Cinema', location: 'Quận 7, TP.HCM' },
+      { name: 'CineStar', location: 'Quận 3, TP.HCM' }
+    ];
+
+    const possibleTimes = ['09:00','10:30','12:00','13:30','15:00','16:30','18:00','19:30','21:00','22:30'];
+
+    function randInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function pickRandom(arr, k) {
+      const a = arr.slice();
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a.slice(0, Math.min(k, a.length));
+    }
+
+    function generateRandomShows(date) {
+      const count = randInt(4, 8); 
+      const movies = pickRandom(sampleMovies, count);
+      return movies.map(m => {
+        const cinema = demoCinemas[randInt(0, demoCinemas.length - 1)];
+        const timesCount = randInt(3, 6);
+        const times = pickRandom(possibleTimes, timesCount).sort((a,b) => a.localeCompare(b));
+        return {
+          movieId: m.movieId,
+          title: m.title,
+          poster: m.poster,
+          genre: m.genre,
+          cinema: `${cinema.name}`,
+          location: cinema.location,
+          date,
+          times
+        };
+      });
+    }
+
+    const datePicker = document.getElementById('datePicker');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const statusEl = document.getElementById('status');
+    const scheduleBody = document.getElementById('scheduleBody');
+
+    const today = new Date().toISOString().slice(0,10);
+    datePicker.value = today;
+
+    refreshBtn.addEventListener('click', loadSchedule);
+    datePicker.addEventListener('change', loadSchedule);
+
+    async function fetchShowtimes(date) {
+      if (API_URL && !API_URL.includes('example.com')) {
+        try {
+          const res = await fetch(`${API_URL}?date=${encodeURIComponent(date)}`);
+          if (!res.ok) throw new Error('Lỗi khi tải dữ liệu');
+          const json = await res.json();
+          return await enrichShowsWithPosters(json);
+        } catch (err) {
+          console.error(err);
+          throw err;
+        }
+      }
+      await new Promise(r => setTimeout(r, 300));
+      const shows = generateRandomShows(date);
+      return await enrichShowsWithPosters(shows);
+    }
+    
+    async function fetchPosterByImdb(imdbID) {
+      if (!imdbID) return '';
+      if (posterCache[imdbID]) return posterCache[imdbID];
+      try {
+        const res = await fetch(`${BASE_URL}?i=${encodeURIComponent(imdbID)}&apikey=${API_KEY}`);
+        if (!res.ok) throw new Error('OMDb lỗi');
+        const json = await res.json();
+        const poster = (json && json.Poster && json.Poster !== 'N/A') ? json.Poster : '';
+        posterCache[imdbID] = poster;
+        return poster;
+      } catch (e) {
+        console.warn('Không lấy được poster cho', imdbID, e);
+        posterCache[imdbID] = '';
+        return '';
+      }
+    }
+
+    async function enrichShowsWithPosters(shows) {
+      if (!Array.isArray(shows)) return shows;
+      const tasks = shows.map(async show => {
+        if ((!show.poster || show.poster === '') && show.movieId) {
+          const p = await fetchPosterByImdb(show.movieId);
+          if (p) show.poster = p;
+        }
+        return show;
+      });
+      return Promise.all(tasks);
+    }
+
+    function clearTable() {
+      scheduleBody.innerHTML = '';
+    }
+
+    function renderEmpty(message) {
+      clearTable();
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<td colspan="3" class="empty">${message}</td>`;
+      scheduleBody.appendChild(tr);
+    }
+
+    function renderShowRows(shows) {
+      clearTable();
+      if (!shows || shows.length === 0) {
+        renderEmpty('Không có lịch chiếu cho ngày này.');
+        return;
+      }
+      shows.forEach(show => {
+        const tr = document.createElement('tr');
+
+        const poster = show.poster && show.poster !== '' ? show.poster : 'https://via.placeholder.com/80x120/1a2a3a/ffffff?text=No+Image';
+
+        const movieCell = document.createElement('td');
+        movieCell.innerHTML = `<div class="movie-cell"><img class="movie-poster" src="${poster}" alt="${escapeHtml(show.title)}"><div>
+          <div style="font-weight:700">${escapeHtml(show.title)}</div>
+          <div style="font-size:0.9rem;color:#bbb">${escapeHtml(show.genre || '')}</div>
+        </div></div>`;
+
+        const cinemaCell = document.createElement('td');
+        cinemaCell.innerHTML = `<div style="font-weight:600">${escapeHtml(show.cinema)}</div><div style="color:#aaa;font-size:0.9rem">${escapeHtml(show.location || '')}</div>`;
+
+        const timesCell = document.createElement('td');
+        if (Array.isArray(show.times) && show.times.length > 0) {
+          const fragment = document.createDocumentFragment();
+          show.times.forEach(time => {
+            const a = document.createElement('a');
+            a.className = 'time-button';
+            const href = `DatVe.html?movieId=${encodeURIComponent(show.movieId || '')}&title=${encodeURIComponent(show.title || '')}&cinema=${encodeURIComponent(show.cinema || '')}&time=${encodeURIComponent(time)}`;
+            a.href = href;
+            a.textContent = time;
+            fragment.appendChild(a);
+          });
+          timesCell.appendChild(fragment);
+        } else {
+          timesCell.innerHTML = `<span style="color:#aaa">Chưa có suất</span>`;
+        }
+
+        tr.appendChild(movieCell);
+        tr.appendChild(cinemaCell);
+        tr.appendChild(timesCell);
+        scheduleBody.appendChild(tr);
+      });
+    }
+
+    function escapeHtml(str = '') {
+      return String(str).replace(/[&<>"']/g, function(m) {
+        return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]);
+      });
+    }
+
+    async function loadSchedule() {
+      const date = datePicker.value || today;
+      statusEl.textContent = 'Đang tải...';
+      try {
+        const shows = await fetchShowtimes(date);
+        renderShowRows(shows);
+        statusEl.textContent = `Đã tải: ${shows.length} mục`;
+      } catch (err) {
+        console.error(err);
+        renderEmpty('Lỗi khi tải lịch chiếu. Vui lòng thử lại.');
+        statusEl.textContent = 'Lỗi';
+      }
+    }
+    loadSchedule();
+  </script>
+</body>
+</html>

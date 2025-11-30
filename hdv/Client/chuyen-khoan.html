@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đang Chờ Thanh Toán - CineMax</title>
+    <style>
+        :root {
+            --primary: #e50914; --secondary: #221f1f; --light: #f5f5f1;
+            --dark: #000000; --warning: #ffa500; --success: #46d369;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, sans-serif; background-color: var(--secondary);
+            color: var(--light); display: flex; align-items: center;
+            justify-content: center; min-height: 100vh; text-align: center; padding: 1rem;
+        }
+        .container {
+            background-color: var(--dark); padding: 3rem; border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); max-width: 500px;
+            width: 100%;
+        }
+        .bank-info {
+            background-color: var(--secondary);
+            border: 1px dashed var(--warning);
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: left;
+            margin: 2rem 0;
+        }
+        .bank-info p { font-size: 1.1rem; margin-bottom: 1rem; color: #fff; }
+        .bank-info span {
+            font-weight: bold; color: var(--warning);
+            font-size: 1.2rem; word-break: break-all;
+        }
+        .icon { font-size: 5rem; line-height: 1; }
+        .icon.success { color: var(--success); }
+        .icon.loading { color: var(--warning); animation: pulse 1.5s infinite; }
+        
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="paymentContainer">
+        
+        <div id="waitingState">
+            <div class="icon loading">⌛</div>
+            <h1>Đang chờ thanh toán</h1>
+            <p>Vui lòng chuyển khoản chính xác thông tin dưới đây. Trang này sẽ tự động cập nhật ngay khi nhận được thanh toán.</p>
+
+            <div class="bank-info">
+                <p>Ngân hàng: <span>Vietcombank</span></p>
+                <p>Số tài khoản: <span>123456789</span></p>
+                <p>Chủ tài khoản: <span>NGUYEN VAN A</span></p>
+                <p>Số tiền: <span id="amount">0 đ</span></p>
+                <p>Nội dung: <span id="orderInfo">PAY_000</span></p>
+            </div>
+            
+            <p style="color: #aaa; font-size: 0.9rem;">
+                (Xin vui lòng không tắt trình duyệt này)
+            </p>
+        </div>
+
+        <div id="successState" style="display: none;">
+            <div class="icon success">✅</div>
+            <h1>Thanh Toán Thành Công!</h1>
+            <p>Vé của bạn đã được xác nhận. Chúc bạn xem phim vui vẻ!</p>
+            <a href="/TrangChu/TrangChu.html" class="btn btn-primary" style="background:var(--primary); color:white; padding: 0.8rem 2rem; border-radius:4px; text-decoration:none;">Về Trang Chủ</a>
+        </div>
+
+    </div>
+
+    <script>
+        let orderId = '';
+        let pollingInterval; 
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            orderId = urlParams.get('orderId'); 
+            const amount = urlParams.get('amount');
+            
+            if (!orderId) {
+                document.getElementById('waitingState').innerHTML = "<h1>Lỗi: Không tìm thấy mã đơn hàng.</h1>";
+                return;
+            }
+
+            const formattedAmount = parseInt(amount).toLocaleString('vi-VN') + ' đ';
+            const orderInfo = `PAY ${orderId}`; 
+            document.getElementById('amount').textContent = formattedAmount;
+            document.getElementById('orderInfo').textContent = orderInfo;
+
+            
+            startPolling();
+        });
+
+        function startPolling() {
+            if (pollingInterval) clearInterval(pollingInterval);
+            pollingInterval = setInterval(() => {
+                checkPaymentStatus();
+            }, 5000); 
+        }
+
+        async function checkPaymentStatus() {
+            try {
+                const response = await fetch(`http://localhost:4000/api/payments/status/${orderId}`);
+                if (!response.ok) return; 
+
+                const data = await response.json();
+
+                console.log("Check status:", data.status);
+
+                if (data.status === 'CONFIRMED') {
+                    clearInterval(pollingInterval); 
+                    showSuccess(); 
+                }
+                
+
+            } catch (error) {
+                console.error("Lỗi Polling:", error);
+                
+            }
+        }
+
+        function showSuccess() {
+            document.getElementById('waitingState').style.display = 'none';
+            document.getElementById('successState').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

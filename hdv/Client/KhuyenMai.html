@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ưu Đãi - CineMax</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                        url('https://static.vecteezy.com/system/resources/thumbnails/006/240/302/small/abstract-soft-focus-sunset-field-landscape-of-yellow-flowers-and-grass-meadow-warm-golden-hour-sunset-sunrise-time-tranquil-spring-summer-nature-closeup-and-blurred-forest-background-idyllic-nature-photo.jpg') center/cover fixed;
+            background-attachment: fixed;
+        }
+
+        main.container {
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        main.container h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            background: linear-gradient(135deg, var(--primary), #ff6b6b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .offer-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(229, 9, 20, 0.3);
+            border-radius: 12px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .offer-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(229, 9, 20, 0.3);
+        }
+
+        .offer-card h2 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .offer-card p {
+            color: var(--light);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .offer-card .badge {
+            display: inline-block;
+            background: rgba(229, 9, 20, 0.2);
+            border: 1px solid var(--primary);
+            color: var(--primary);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .offer-card .btn {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .offer-icon {
+            font-size: 2rem;
+        }
+
+        .term-text {
+            color: var(--gray);
+            font-size: 0.85rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .countdown {
+            background: rgba(229, 9, 20, 0.1);
+            border: 1px solid rgba(229, 9, 20, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            margin-top: 1rem;
+            color: var(--light);
+        }
+
+        .countdown-time {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        @media (max-width: 768px) {
+            main.container h1 {
+                font-size: 2rem;
+            }
+
+            .offers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .offer-card {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">Cine<span>Max</span></a>
+            
+            <ul class="nav-menu">
+                <li><a href="index.html">Trang Chủ</a></li>
+                <li><a href="Phim.html">Phim</a></li>
+                <li><a href="RapChieu.html">Rạp Chiếu</a></li>
+                <li><a href="KhuyenMai.html">Khuyến Mãi</a></li>
+                <li><a href="LienHe.html">Liên Hệ</a></li>
+                <li><a href="DangKyThanhVien.html">Đăng ký hội viên</a></li>
+            </ul>
+            
+            <div class="user-actions">
+                <button class="btn btn-outline" id="loginBtn" onclick="redirectToTaiKhoan()">Đăng Nhập</button>
+                <button class="btn btn-primary" id="registerBtn" onclick="redirectToTaiKhoan()">Đăng Ký</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <h1>Ưu Đãi Hấp Dẫn</h1>
+
+        <div class="offers-grid">
+            <div class="offer-card">
+                <div class="badge">Limited Time</div>
+                <h2><span class="offer-icon">🎟</span> Giảm 50% Vé Thứ 2</h2>
+                <p>Áp dụng cho tất cả các suất chiếu trong ngày thứ 2 hàng tuần tại hệ thống rạp CineMax. Cơ hội tuyệt vời để thưởng thức bộ phim yêu thích với giá cực kỳ ưu đãi.</p>
+                <div class="countdown">
+                    <div>Thời gian còn lại:</div>
+                    <div class="countdown-time" id="countdown1">7 ngày</div>
+                </div>
+                <p class="term-text">* Không áp dụng cho ghế VIP, suất chiếu đặc biệt và những buổi ra mắt phim.</p>
+            </div>
+
+            <div class="offer-card">
+                <div class="badge">Best Seller</div>
+                <h2><span class="offer-icon">🍿</span> Combo Bắp & Nước</h2>
+                <p>Nhận ngay combo 1 bắp rang bơ + 1 nước ngọt (vị tùy chọn) với giá ưu đãi cực rẻ chỉ 49.000đ. Hoàn hảo cho một buổi xem phim thú vị.</p>
+                <p style="color: var(--primary); font-size: 1.2rem; font-weight: bold;">Giá chỉ: 49.000₫</p>
+                <button class="btn btn-primary">Mua Combo</button>
+                <p class="term-text">* Áp dụng cho khách hàng mua vé online. Hợp lệ đến hết năm 2025.</p>
+            </div>
+
+            <div class="offer-card">
+                <div class="badge">Premium</div>
+                <h2><span class="offer-icon">🌟</span> Thành Viên VIP</h2>
+                <p>Trở thành thành viên VIP của CineMax và tận hưởng các quyền lợi độc quyền:</p>
+                <ul style="color: var(--light); line-height: 2; margin-bottom: 1rem;">
+                    <li>✓ Giảm 20% giá vé</li>
+                    <li>✓ Giảm 10% combo ăn uống</li>
+                    <li>✓ Ưu tiên đặt chỗ ghế tốt</li>
+                    <li>✓ Tham gia chiếu sớm mỗi tháng</li>
+                </ul>
+                <a href="DangKyThanhVien.html" class="btn btn-primary">Đăng Ký Ngay</a>
+                <p class="term-text">* Membership hợp lệ trong 12 tháng. Có thể gia hạn sau khi hết hạn.</p>
+            </div>
+
+            <div class="offer-card">
+                <div class="badge">New</div>
+                <h2><span class="offer-icon">👨‍👩‍👧‍👦</span> Ưu Đãi Gia Đình</h2>
+                <p>Mua 4 vé trở lên, nhận thêm 15% giảm giá cho toàn bộ đơn hàng. Thêm dịch vụ miễn phí nâng cấp combo cho 1 khách.</p>
+                <p style="color: var(--primary); font-size: 1.1rem; font-weight: bold;">Tiết kiệm tối đa cho gia đình!</p>
+                <button class="btn btn-outline">Chi Tiết</button>
+                <p class="term-text">* Áp dụng cho các suất chiếu từ 14h00 trở đi.</p>
+            </div>
+
+            <div class="offer-card">
+                <div class="badge">Exclusive</div>
+                <h2><span class="offer-icon">🎓</span> Học Sinh - Sinh Viên</h2>
+                <p>Xuất trình thẻ học sinh/sinh viên còn hạn để nhận giảm 25% giá vé cho tất cả các ngày trong tuần. Áp dụng cho vé thường không kèm combo.</p>
+                <button class="btn btn-outline">Tìm Hiểu Thêm</button>
+                <p class="term-text">* Yêu cầu xuất trình thẻ gốc khi mua vé tại quầy.</p>
+            </div>
+
+            <div class="offer-card">
+                <div class="badge">Anniversary</div>
+                <h2><span class="offer-icon">🎂</span> Sinh Nhật Đặc Biệt</h2>
+                <p>Sinh nhật bạn là ngày đặc biệt! CineMax tặng bạn 1 vé xem phim miễn phí khi mua 1 vé full giá. Cơ hội tuyệt vời để ăn mừng.</p>
+                <button class="btn btn-primary">Đăng Ký Sinh Nhật</button>
+                <p class="term-text">* Có hiệu lực trong tháng sinh nhật. Yêu cầu xác minh bằng CCCD.</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="GioiThieu.html">Giới thiệu</a>
+                <a href="DieuKhoanSuDung.html">Điều khoản sử dụng</a>
+                <a href="ChinhSachBaoMat.html">Chính sách bảo mật</a>
+                <a href="CauHoiThuongGap.html">Câu hỏi thường gặp</a>
+                <a href="LienHe.html">Liên hệ</a>
+            </div>
+            <p class="copyright">© 2025 CineMax. Tất cả các quyền được bảo lưu.</p>
+        </div>
+    </footer>
+
+    <script>
+        function parseJwt(token) {
+            try {
+                const payload = token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');
+                const json = decodeURIComponent(atob(payload).split('').map(c => '%' + ('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
+                return JSON.parse(json);
+            } catch (e) { return null; }
+        }
+
+        function getStoredToken() {
+            return localStorage.getItem('adminToken') || localStorage.getItem('token') || null;
+        }
+
+        function logout() {
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            window.location.href = 'index.html';
+        }
+
+        function buildAuthUIFromToken(token) {
+            const payload = parseJwt(token) || {};
+            const name = payload.username || payload.name || payload.email || '';
+            const initials = (name || '').split(' ').filter(Boolean).map(s => s[0]).join('').slice(0,2).toUpperCase() ||
+                           (payload.email ? payload.email[0].toUpperCase() : 'U');
+
+            const wrap = document.createElement('div');
+            wrap.className = 'auth-wrap';
+
+            const avatarBtn = document.createElement('button');
+            avatarBtn.className = 'avatar-btn';
+            avatarBtn.title = name || 'Tài khoản';
+            avatarBtn.innerHTML = `<span class="avatar-initials">${initials}</span>`;
+            avatarBtn.addEventListener('click', () => { window.location.href = 'ThongTinCaNhan.html'; });
+
+            const profileLink = document.createElement('a');
+            profileLink.className = 'auth-action';
+            profileLink.href = 'ThongTinCaNhan.html';
+            profileLink.textContent = 'Hồ sơ';
+
+            const logoutBtn = document.createElement('button');
+            logoutBtn.className = 'auth-action';
+            logoutBtn.textContent = 'Đăng xuất';
+            logoutBtn.addEventListener('click', logout);
+
+            wrap.appendChild(avatarBtn);
+            wrap.appendChild(profileLink);
+            wrap.appendChild(logoutBtn);
+
+            return wrap;
+        }
+
+        function restoreDefaultAuthButtons(container) {
+            container.innerHTML = '';
+            const loginBtn = document.createElement('button');
+            loginBtn.className = 'btn btn-outline';
+            loginBtn.id = 'loginBtn';
+            loginBtn.textContent = 'Đăng Nhập';
+            loginBtn.onclick = redirectToTaiKhoan;
+
+            const registerBtn = document.createElement('button');
+            registerBtn.className = 'btn btn-primary';
+            registerBtn.id = 'registerBtn';
+            registerBtn.textContent = 'Đăng Ký';
+            registerBtn.onclick = redirectToTaiKhoan;
+
+            container.appendChild(loginBtn);
+            container.appendChild(registerBtn);
+        }
+
+        function updateAuthUI() {
+            const token = getStoredToken();
+            const userActions = document.querySelectorAll('.user-actions');
+            if (!userActions) return;
+            userActions.forEach(container => {
+                if (token) {
+                    container.innerHTML = '';
+                    const authUI = buildAuthUIFromToken(token);
+                    container.appendChild(authUI);
+                } else {
+                    restoreDefaultAuthButtons(container);
+                }
+            });
+        }
+
+        function redirectToTaiKhoan() {
+            window.location.href = 'TaiKhoan.html';
+        }
+
+        window.addEventListener('storage', (e) => {
+            if (e.key === 'adminToken' || e.key === 'token') updateAuthUI();
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateAuthUI();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMax - Đăng Nhập & Đăng Ký</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+   
+        :root {
+            --primary: #e50914;
+            --primary-dark: #b2070f;
+            --secondary: #221f1f;
+            --light: #f5f5f1;
+            --dark: #000000;
+            --gray: #757575;
+            --success: #46d369;
+            --transition: all 0.3s ease;
+        }
+
+        body {
+            background-color: var(--secondary);
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--dark);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .logo span {
+            color: var(--light);
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .auth-container {
+            display: flex;
+            width: 100%;
+            max-width: 900px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .auth-forms {
+            flex: 1;
+            padding: 3rem;
+        }
+
+        .auth-hero {
+            flex: 1;
+            background: linear-gradient(rgba(229, 9, 20, 0.8), rgba(178, 7, 15, 0.9)), 
+                        url('https://images.unsplash.com/photo-1489599809505-fc6c1bb11673?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .auth-hero h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .auth-hero p {
+            font-size: 1.1rem;
+            max-width: 300px;
+        }
+
+        .form-title {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            color: var(--light);
+        }
+
+        .form-subtitle {
+            color: var(--gray);
+            margin-bottom: 2rem;
+        }
+
+        .form-toggle {
+            display: flex;
+            margin-bottom: 2rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 0.8rem;
+            text-align: center;
+            background: transparent;
+            border: none;
+            color: var(--light);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .toggle-btn.active {
+            background-color: var(--primary);
+        }
+
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            color: var(--light);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(229, 9, 20, 0.2);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gray);
+            cursor: pointer;
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .remember-me {
+            display: flex;
+            align-items: center;
+        }
+
+        .remember-me input {
+            margin-right: 0.5rem;
+        }
+
+        .forgot-password {
+            color: var(--primary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+            color: var(--gray);
+        }
+
+        .divider::before,
+        .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .divider span {
+            padding: 0 1rem;
+        }
+
+        .social-login {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--light);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+
+        .social-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .terms {
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+            color: var(--gray);
+            text-align: center;
+        }
+
+        .terms a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .terms a:hover {
+            text-decoration: underline;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            padding: 2rem;
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links a {
+            color: var(--gray);
+            text-decoration: none;
+            margin: 0 1rem;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--light);
+        }
+
+        .copyright {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .auth-container {
+                flex-direction: column;
+            }
+            
+            .auth-hero {
+                padding: 2rem 1rem;
+                order: -1;
+            }
+            
+            .auth-forms {
+                padding: 2rem;
+            }
+            
+            .social-login {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="index.html" class="logo">Cine<span>Max</span></a>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="auth-container">
+            <div class="auth-forms">
+                <div class="form-toggle">
+                    <button class="toggle-btn active" id="loginToggle">Đăng Nhập</button>
+                    <button class="toggle-btn" id="registerToggle">Đăng Ký</button>
+                </div>
+                <form class="form active" id="loginForm">
+                    <h2 class="form-title">Chào mừng trở lại</h2>
+                    <p class="form-subtitle">Đăng nhập để tiếp tục trải nghiệm</p>
+                    
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" class="form-control" placeholder="Nhập email của bạn" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="loginPassword">Mật khẩu</label>
+                        <div class="password-container">
+                            <input type="password" id="loginPassword" class="form-control" placeholder="Nhập mật khẩu" required>
+                            <button type="button" class="password-toggle" id="loginPasswordToggle">👁️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-options">
+                        <div class="remember-me">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Ghi nhớ đăng nhập</label>
+                        </div>
+                        <a href="QuenMatKhau.html" class="forgot-password">Quên mật khẩu?</a>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Đăng Nhập</button>
+                    
+                    <div class="divider">
+                        <span>Hoặc đăng nhập với</span>
+                    </div>
+                    
+                    <div class="social-login">
+                        <button type="button" class="social-btn" id="google-login-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                            </svg>
+                            Google
+                        </button>
+                        <button type="button" class="social-btn" id="facebook-login-btn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                            Facebook
+                        </button>
+                    </div>
+                </form>
+                <form class="form" id="registerForm">
+                    <h2 class="form-title">Tạo tài khoản mới</h2>
+                    <p class="form-subtitle">Đăng ký để bắt đầu trải nghiệm</p>
+                    
+                    <div class="form-group">
+                        <label for="fullName">Họ và tên</label>
+                        <input type="text" id="fullName" class="form-control" placeholder="Nhập họ và tên" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" class="form-control" placeholder="Nhập email của bạn" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="tel" id="phone" class="form-control" placeholder="Nhập số điện thoại" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="registerPassword">Mật khẩu</label>
+                        <div class="password-container">
+                            <input type="password" id="registerPassword" class="form-control" placeholder="Tạo mật khẩu" required>
+                            <button type="button" class="password-toggle" id="registerPasswordToggle">👁️</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="confirmPassword">Xác nhận mật khẩu</label>
+                        <div class="password-container">
+                            <input type="password" id="confirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" required>
+                            <button type="button" class="password-toggle" id="confirmPasswordToggle">👁️</button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">Đăng Ký</button>
+                    
+                    <div class="terms">
+                        Bằng việc đăng ký, bạn đã đồng ý với <a href="DieuKhoanSuDung.html">Điều khoản sử dụng</a> và <a href="ChinhSachBaoMat.html">Chính sách bảo mật</a> của chúng tôi.
+                    </div>
+                </form>
+            </div>
+            
+            <div class="auth-hero">
+                <h2>Trải nghiệm điện ảnh tuyệt vời</h2>
+                <p>Đặt vé xem phim nhanh chóng, dễ dàng với nhiều ưu đãi hấp dẫn dành riêng cho thành viên</p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="GioiThieu.html">Giới thiệu</a>
+                <a href="DieuKhoanSuDung.html">Điều khoản sử dụng</a>
+                <a href="ChinhSachBaoMat.html">Chính sách bảo mật</a>
+                <a href="CauHoiThuongGap.html">Câu hỏi thường gặp</a>
+                <a href="LienHe.html">Liên hệ</a>
+            </div>
+            <p class="copyright">© 2023 CineMax. Tất cả các quyền được bảo lưu.</p>
+        </div>
+    </footer>
+    <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+        const API_URL = 'http://localhost:3000/api/users'; 
+        const API_AUTH_URL = 'http://localhost:3000/api/auth';
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            const username = document.getElementById('fullName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+            const password = document.getElementById('registerPassword').value.trim(); 
+            const phone = document.getElementById('phone').value.trim(); 
+
+            if (!username || !email || !password) {
+                alert('Vui lòng điền đầy đủ thông tin đăng ký.');
+                return;
+            }
+            try {
+                const res = await fetch(`${API_URL}/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ username, email, password, phone })
+                });
+                const data = await res.json();
+                if (res.ok) {
+                    alert('Đăng ký thành công. Vui lòng đăng nhập.');
+                    loginToggle.click();
+                } else {
+                    alert(data.error || 'Đăng ký thất bại');
+                }
+            } catch (err) {
+                console.error('Register error:', err);
+                alert('Lỗi kết nối tới server.');
+            }
+        }
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value.trim(); 
+
+            if (!email || !password) {
+                alert('Vui lòng nhập email và mật khẩu.');
+                return;
+            }
+            try {
+                const res = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ email, password })
+                });
+                const data = await res.json();
+                if (res.ok && data.data && data.data.token) { 
+                    localStorage.setItem('token', data.data.token);
+                    localStorage.setItem('user', JSON.stringify(data.data.user || {}));
+                    window.location.href = 'index.html';
+                } else {
+                    alert(data.error || 'Email hoặc mật khẩu không đúng');
+                }
+            } catch (err) {
+                console.error('Login error:', err);
+                alert('Lỗi kết nối tới server.');
+            }
+        }
+        
+        async function createBooking(payload) {
+            const token = localStorage.getItem('token');
+            const res = await fetch('http://localhost:3000/api/bookings', { 
+                method: 'POST',
+                headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(payload)
+            });
+            return res.json();
+        }
+
+        function setupPasswordToggle(passwordId, toggleId) {
+            const passwordInput = document.getElementById(passwordId);
+            const toggleButton = document.getElementById(toggleId);
+            if (!passwordInput || !toggleButton) return; 
+            toggleButton.addEventListener('click', () => {
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    toggleButton.textContent = '🙈';
+                } else {
+                    passwordInput.type = 'password';
+                    toggleButton.textContent = '👁️';
+                }
+            });
+        }
+
+        
+        
+        const loginToggle = document.getElementById('loginToggle');
+        const registerToggle = document.getElementById('registerToggle');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const googleBtn = document.getElementById('google-login-btn');
+        const facebookBtn = document.getElementById('facebook-login-btn');
+
+        
+        if (loginToggle) {
+            loginToggle.addEventListener('click', () => {
+                loginToggle.classList.add('active');
+                registerToggle.classList.remove('active');
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+            });
+        }
+
+        if (registerToggle) {
+            registerToggle.addEventListener('click', () => {
+                registerToggle.classList.add('active');
+                loginToggle.classList.remove('active');
+                registerForm.classList.add('active');
+                loginForm.classList.remove('active');
+            });
+        }
+        
+       
+        setupPasswordToggle('loginPassword', 'loginPasswordToggle');
+        setupPasswordToggle('registerPassword', 'registerPasswordToggle');
+        setupPasswordToggle('confirmPassword', 'confirmPasswordToggle');
+
+        
+        if (loginForm) loginForm.addEventListener('submit', handleLogin);
+        if (registerForm) registerForm.addEventListener('submit', handleRegister);
+
+       
+        if (googleBtn) {
+            googleBtn.addEventListener('click', () => {
+                window.location.href = `${API_AUTH_URL}/google`;
+            });
+        }
+        
+        if (facebookBtn) {
+            facebookBtn.addEventListener('click', () => {
+                window.location.href = `${API_AUTH_URL}/facebook`;
+            });
+        }
+
+        
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error')) {
+            alert('Đăng nhập bằng mạng xã hội thất bại. Vui lòng thử lại.');
+        }
+        
+    }); 
+</script>
+</body>
+</html>
