@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard - CineMax</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { background-color: #141414; color: #fff; font-family: sans-serif; }
+        .admin-container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #1f1f1f; padding: 25px; border-radius: 10px; border: 1px solid #333; display: flex; align-items: center; gap: 20px; }
+        .stat-icon { font-size: 3rem; color: #e50914; }
+        .stat-info h3 { margin: 0; color: #999; font-size: 1rem; }
+        .stat-info p { margin: 5px 0 0; font-size: 2rem; font-weight: bold; color: #fff; }
+
+        .table-container { background: #1f1f1f; padding: 20px; border-radius: 10px; border: 1px solid #333; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 15px; color: #e50914; border-bottom: 2px solid #333; }
+        td { padding: 15px; border-bottom: 1px solid #333; color: #ccc; }
+        .status-badge { padding: 5px 10px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; }
+        .status-pending { background: #b8860b; color: #fff; }
+        .status-confirmed { background: #2e8b57; color: #fff; }
+        
+        .refresh-btn { float: right; cursor: pointer; color: #e50914; }
+        .refresh-btn:hover { color: #fff; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-container">
+            <a href="#" class="logo">Cine<span>Max Admin</span></a>
+            <a href="index.html" class="btn btn-outline">Về trang chủ</a>
+        </div>
+    </header>
+
+    <main class="admin-container">
+        <h2 style="margin-bottom: 20px;">Tổng Quan Hệ Thống <i class="fas fa-sync-alt refresh-btn" onclick="loadDashboard()"></i></h2>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <i class="fas fa-ticket-alt stat-icon"></i>
+                <div class="stat-info">
+                    <h3>VÉ ĐÃ BÁN</h3>
+                    <p id="total-tickets">0</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <i class="fas fa-money-bill-wave stat-icon"></i>
+                <div class="stat-info">
+                    <h3>DOANH THU</h3>
+                    <p id="total-revenue">0 đ</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <h3>Giao Dịch Gần Nhất</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID Đơn</th>
+                        <th>Thời gian</th>
+                        <th>Ghế đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody id="booking-list">
+                    <tr><td colspan="5" style="text-align: center;">Đang tải...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api/bookings'; 
+
+        async function loadDashboard() {
+            try {
+                const statsRes = await fetch(`${API_BASE}/stats/summary`);
+                const stats = await statsRes.json();
+                
+
+                document.getElementById('total-tickets').textContent = stats.bookings;
+                document.getElementById('total-revenue').textContent = parseInt(stats.revenue).toLocaleString('vi-VN') + ' đ';
+
+
+                const listRes = await fetch(`${API_BASE}/stats/latest`);
+                const bookings = await listRes.json();
+
+                const tbody = document.getElementById('booking-list');
+                tbody.innerHTML = '';
+
+                bookings.forEach(b => {
+                    const statusClass = b.status === 'confirmed' ? 'status-confirmed' : 'status-pending';
+                    const row = `
+                        <tr>
+                            <td>#${b.id}</td>
+                            <td>${new Date(b.createdAt).toLocaleString('vi-VN')}</td>
+                            <td>${b.seats}</td>
+                            <td style="color: #46d369; font-weight: bold;">${parseInt(b.totalPrice).toLocaleString('vi-VN')} đ</td>
+                            <td><span class="status-badge ${statusClass}">${b.status.toUpperCase()}</span></td>
+                        </tr>
+                    `;
+                    tbody.insertAdjacentHTML('beforeend', row);
+                });
+
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+
+        setInterval(loadDashboard, 5000);
+        
+        loadDashboard();
+    </script>
+</body>
+</html>
